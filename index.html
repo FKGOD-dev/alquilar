@@ -14,14 +14,29 @@
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
             height: 100vh;
-            background: linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.4)), 
-                        url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 600"><defs><pattern id="grass" x="0" y="0" width="4" height="4" patternUnits="userSpaceOnUse"><rect width="4" height="4" fill="%23228B22"/><path d="M0,4 Q2,2 4,4 M0,0 Q2,2 4,0" stroke="%23006400" stroke-width="0.5" fill="none"/></pattern></defs><rect width="100%" height="100%" fill="url(%23grass)"/></svg>');
+            background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.3)), 
+                        url('https://unsplash.com/fotos/primer-plano-de-una-linea-blanca-sobre-hierba-verde-en-un-campo-de-futbol-HgwY_YQ1m0w');
             background-size: cover;
             background-position: center;
             background-attachment: fixed;
             display: flex;
             flex-direction: column;
             overflow: hidden;
+            position: relative;
+        }
+
+        body::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('https://unsplash.com/fotos/primer-plano-de-una-linea-blanca-sobre-hierba-verde-en-un-campo-de-futbol-HgwY_YQ1m0w');
+            background-size: cover;
+            background-position: center;
+            filter: blur(1px);
+            z-index: -1;
         }
 
         /* Navegación superior */
@@ -245,9 +260,9 @@
         </div>
         
         <div class="nav-links">
-            <a href="#" class="nav-link">Buscar canchas</a>
-            <a href="#" class="btn-owner">Soy propietario</a>
-            <a href="#" class="nav-link">Quiénes somos</a>
+            <a href="#buscar" class="nav-link" onclick="mostrarBuscar()">Buscar canchas</a>
+            <a href="#propietario" class="btn-owner" onclick="mostrarPropietario()">Soy propietario</a>
+            <a href="#nosotros" class="nav-link" onclick="mostrarNosotros()">Quiénes somos</a>
         </div>
     </nav>
 
@@ -261,9 +276,27 @@
         </p>
 
         <div class="cta-buttons">
-            <a href="#" class="btn btn-primary">Buscar canchas</a>
-            <a href="#" class="btn btn-secondary">Publicar mi cancha</a>
+            <a href="#buscar" class="btn btn-primary" onclick="mostrarBuscar()">Buscar canchas</a>
+            <a href="#publicar" class="btn btn-secondary" onclick="mostrarPublicar()">Publicar mi cancha</a>
         </div>
     </main>
+
+    <script>
+        function mostrarBuscar() {
+            window.location.href = 'buscar.html';
+        }
+
+        function mostrarPropietario() {
+            window.location.href = 'propietarios.html';
+        }
+
+        function mostrarNosotros() {
+            window.location.href = 'nosotros.html';
+        }
+
+        function mostrarPublicar() {
+            window.location.href = 'publicar.html';
+        }
+    </script>
 </body>
 </html>
