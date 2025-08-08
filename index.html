@@ -3,72 +3,323 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Turnero - Plataforma de Reservas Deportivas</title>
-    <meta name="description" content="Reserva canchas de fútbol, pádel y otros deportes de forma rápida y sencilla. La plataforma líder en gestión de espacios deportivos.">
-    <link rel="stylesheet" href="css/main.css">
+    <title>Complejo Deportivo Central - Turnero</title>
+    <meta name="description" content="Reserva en el Complejo Deportivo Central. Cancha de fútbol 5 con césped sintético, vestuarios completos y todas las comodidades en Villa Crespo.">
+    <link rel="stylesheet" href="css/cancha-detalle.css">
 </head>
 <body>
-    <nav class="navbar">
-        <div class="logo" onclick="window.location.href='index.html'">
-            <div class="logo-icon">T</div>
-            <div class="logo-text">Turnero</div>
+    <header class="header">
+        <div class="nav-container">
+            <div class="logo" onclick="window.location.href='index.html'">
+                <div class="logo-icon">T</div>
+                <div class="logo-text">Turnero</div>
+            </div>
+            <div class="nav-buttons">
+                <button class="theme-toggle" onclick="toggleTheme()" id="themeToggle" title="Cambiar tema">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="5"/>
+                        <line x1="12" y1="1" x2="12" y2="3"/>
+                        <line x1="12" y1="21" x2="12" y2="23"/>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
+                        <line x1="1" y1="12" x2="3" y2="12"/>
+                        <line x1="21" y1="12" x2="23" y2="12"/>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+                    </svg>
+                </button>
+                <button class="search-btn" onclick="window.location.href='buscar.html'" title="Buscar canchas">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="11" cy="11" r="8"/>
+                        <path d="m21 21-4.35-4.35"/>
+                    </svg>
+                </button>
+            </div>
         </div>
-        
-        <div class="nav-links">
-            <a href="buscar.html" class="nav-link">Buscar Canchas</a>
-            <a href="#propietario" class="btn-owner">Soy Propietario</a>
-            <a href="#nosotros" class="nav-link">Empresa</a>
-            <a href="#contacto" class="nav-link">Soporte</a>
-        </div>
-    </nav>
+    </header>
 
-    <main class="main-content">
+    <main class="container">
         <section class="hero-section">
-            <h1 class="hero-title">
-                Reserva canchas deportivas en <span class="highlight">segundos</span>
-            </h1>
+            <div class="hero-image" onclick="openGallery()">
+                <div style="font-size: 2.5rem; font-weight: bold;">CDC</div>
+                <div class="image-overlay">
+                    <button class="gallery-btn" onclick="event.stopPropagation(); openGallery()">
+                        Ver galería (8 fotos)
+                    </button>
+                </div>
+            </div>
             
-            <p class="hero-subtitle">
-                La plataforma más completa para encontrar y reservar espacios deportivos. 
-                Sin llamadas, sin complicaciones, solo deportes.
-            </p>
+            <div class="hero-content">
+                <div class="title-section">
+                    <div>
+                        <h1 class="cancha-title">Complejo Deportivo Central</h1>
+                        <div class="cancha-location" onclick="openMaps()">
+                            Av. Corrientes 1234, Villa Crespo, CABA
+                        </div>
+                    </div>
+                    <div class="price-section">
+                        <div class="price">$8.000/hora</div>
+                        <button class="reserve-btn" onclick="iniciarReserva()">Seleccionar horario</button>
+                    </div>
+                </div>
 
-            <div class="cta-buttons">
-                <a href="buscar.html" class="btn btn-primary">Explorar Canchas</a>
-                <a href="#publicar" class="btn btn-secondary">Publicar Espacio</a>
+                <div class="features-section">
+                    <span class="feature-tag">Fútbol 5</span>
+                    <span class="feature-tag">Vestuarios</span>
+                    <span class="feature-tag">Estacionamiento</span>
+                    <span class="feature-tag">Iluminación LED</span>
+                    <span class="feature-tag">Césped sintético</span>
+                    <span class="feature-tag">Seguridad 24hs</span>
+                </div>
+
+                <div class="rating-section">
+                    <div class="stars">★★★★☆</div>
+                    <span class="rating-text"><span id="currentRating">4.2</span> de 5 (<span id="reviewCount">47</span> reseñas)</span>
+                </div>
             </div>
         </section>
 
-        <section class="stats-section">
-            <div class="stat-item">
-                <span class="stat-number" data-target="1200">0</span>
-                <span class="stat-label">Canchas Activas</span>
+        <div class="info-grid">
+            <div class="main-info">
+                <div class="info-card">
+                    <h2 class="info-title">Descripción</h2>
+                    <p class="description">
+                        Complejo deportivo moderno ubicado en el corazón de Villa Crespo. 
+                        Contamos con canchas de fútbol 5 de primera calidad con césped sintético 
+                        último modelo, vestuarios amplios y limpios, área de parrilla para después 
+                        del partido y estacionamiento seguro. Perfecto para juntadas con amigos, 
+                        torneos empresariales o entrenamientos regulares.
+                    </p>
+
+                    <h3 class="info-title">Instalaciones</h3>
+                    <ul class="amenities-list">
+                        <li class="amenity-item">
+                            <span class="amenity-icon">✓</span>
+                            Vestuarios con duchas de agua caliente
+                        </li>
+                        <li class="amenity-item">
+                            <span class="amenity-icon">✓</span>
+                            Área de parrilla equipada
+                        </li>
+                        <li class="amenity-item">
+                            <span class="amenity-icon">✓</span>
+                            Estacionamiento gratuito y seguro
+                        </li>
+                        <li class="amenity-item">
+                            <span class="amenity-icon">✓</span>
+                            Sistema de iluminación LED
+                        </li>
+                        <li class="amenity-item">
+                            <span class="amenity-icon">✓</span>
+                            Kiosco y área de descanso
+                        </li>
+                        <li class="amenity-item">
+                            <span class="amenity-icon">✓</span>
+                            WiFi gratuito en todas las áreas
+                        </li>
+                        <li class="amenity-item">
+                            <span class="amenity-icon">✓</span>
+                            Alquiler de equipamiento deportivo
+                        </li>
+                        <li class="amenity-item">
+                            <span class="amenity-icon">✓</span>
+                            Vigilancia y seguridad 24 horas
+                        </li>
+                    </ul>
+
+                    <div class="contact-info">
+                        <h3 class="info-title">Información de contacto</h3>
+                        <div class="contact-item" data-icon="📱">
+                            +54 11 1234-5678
+                        </div>
+                        <div class="contact-item" data-icon="📧">
+                            info@complejocentral.com.ar
+                        </div>
+                        <div class="contact-item" data-icon="🌐">
+                            www.complejocentral.com.ar
+                        </div>
+                        <div class="contact-item" data-icon="📷">
+                            @complejocentral
+                        </div>
+                    </div>
+                </div>
             </div>
-            <div class="stat-item">
-                <span class="stat-number" data-target="25000">0</span>
-                <span class="stat-label">Reservas Mensuales</span>
+
+            <div class="sidebar">
+                <div class="calendar-section">
+                    <h2 class="info-title">Horarios disponibles</h2>
+                    <p class="calendar-subtitle">Selecciona uno o más horarios para hoy:</p>
+                    
+                    <div class="time-slots">
+                        <div class="time-slot occupied">08:00</div>
+                        <div class="time-slot occupied">09:00</div>
+                        <div class="time-slot" onclick="selectTime(this, '10:00')">10:00</div>
+                        <div class="time-slot" onclick="selectTime(this, '11:00')">11:00</div>
+                        <div class="time-slot occupied">12:00</div>
+                        <div class="time-slot" onclick="selectTime(this, '13:00')">13:00</div>
+                        <div class="time-slot" onclick="selectTime(this, '14:00')">14:00</div>
+                        <div class="time-slot" onclick="selectTime(this, '15:00')">15:00</div>
+                        <div class="time-slot occupied">16:00</div>
+                        <div class="time-slot" onclick="selectTime(this, '17:00')">17:00</div>
+                        <div class="time-slot" onclick="selectTime(this, '18:00')">18:00</div>
+                        <div class="time-slot" onclick="selectTime(this, '19:00')">19:00</div>
+                        <div class="time-slot" onclick="selectTime(this, '20:00')">20:00</div>
+                        <div class="time-slot occupied">21:00</div>
+                        <div class="time-slot" onclick="selectTime(this, '22:00')">22:00</div>
+                        <div class="time-slot occupied">23:00</div>
+                    </div>
+
+                    <div class="calendar-legend">
+                        <div class="legend-item">
+                            <div class="legend-color" style="background: rgba(16, 185, 129, 0.2); border: 1px solid rgba(16, 185, 129, 0.3);"></div>
+                            <span>Disponible</span>
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-color" style="background: rgba(239, 68, 68, 0.2); border: 1px solid rgba(239, 68, 68, 0.3);"></div>
+                            <span>Ocupado</span>
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-color" style="background: #10b981;"></div>
+                            <span>Seleccionado</span>
+                        </div>
+                        <div class="calendar-tip">
+                            Puedes seleccionar múltiples horarios consecutivos para reservas más largas.
+                        </div>
+                    </div>
+                </div>
             </div>
-            <div class="stat-item">
-                <span class="stat-number" data-target="98">0</span>
-                <span class="stat-label">% Satisfacción</span>
+        </div>
+
+        <section class="reviews-section">
+            <div class="reviews-header">
+                <h2 class="info-title">Reseñas de usuarios</h2>
+                <button class="write-review-btn" onclick="openReviewModal()">
+                    Escribir reseña
+                </button>
+            </div>
+            
+            <div id="reviewsList">
+                <div class="review-item">
+                    <div class="review-header">
+                        <span class="reviewer-name">Carlos M.</span>
+                        <div>
+                            <span class="stars">★★★★★</span>
+                            <span class="review-date">Hace 3 días</span>
+                        </div>
+                    </div>
+                    <p class="review-text">
+                        Excelente cancha! El césped sintético está en perfecto estado y los vestuarios 
+                        muy limpios. El área de parrilla es un plus genial para después del partido. 
+                        Definitivamente volvemos.
+                    </p>
+                </div>
+
+                <div class="review-item">
+                    <div class="review-header">
+                        <span class="reviewer-name">María L.</span>
+                        <div>
+                            <span class="stars">★★★★☆</span>
+                            <span class="review-date">Hace 1 semana</span>
+                        </div>
+                    </div>
+                    <p class="review-text">
+                        Muy buena ubicación y fácil acceso. El estacionamiento es cómodo y seguro. 
+                        Solo le falta un poco más de iluminación en los vestuarios, pero en general 
+                        muy recomendable.
+                    </p>
+                </div>
+
+                <div class="review-item">
+                    <div class="review-header">
+                        <span class="reviewer-name">Diego R.</span>
+                        <div>
+                            <span class="stars">★★★★★</span>
+                            <span class="review-date">Hace 2 semanas</span>
+                        </div>
+                    </div>
+                    <p class="review-text">
+                        Venimos todos los martes con los chicos del trabajo. La atención es excelente 
+                        y siempre está todo impecable. La relación precio-calidad es muy buena.
+                    </p>
+                </div>
             </div>
         </section>
     </main>
 
-    <button class="theme-toggle" onclick="toggleTheme()" id="themeToggle" title="Cambiar tema">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <circle cx="12" cy="12" r="5"/>
-            <line x1="12" y1="1" x2="12" y2="3"/>
-            <line x1="12" y1="21" x2="12" y2="23"/>
-            <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/>
-            <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
-            <line x1="1" y1="12" x2="3" y2="12"/>
-            <line x1="21" y1="12" x2="23" y2="12"/>
-            <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/>
-            <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
-        </svg>
-    </button>
+    <!-- Gallery Modal -->
+    <div class="modal gallery-modal" id="galleryModal">
+        <div class="modal-content">
+            <div class="modal-header" style="justify-content: flex-end; margin-bottom: 10px;">
+                <button class="close-btn" onclick="closeModal('galleryModal')">&times;</button>
+            </div>
+            <div class="gallery-container">
+                <img id="currentImage" class="gallery-image" src="" alt="Foto de la cancha">
+                <div class="gallery-nav">
+                    <button class="nav-btn" id="prevBtn" onclick="changeImage(-1)">‹</button>
+                    <div class="gallery-counter">
+                        <span id="currentIndex">1</span> / <span id="totalImages">8</span>
+                    </div>
+                    <button class="nav-btn" id="nextBtn" onclick="changeImage(1)">›</button>
+                </div>
+                <div class="gallery-thumbnails" id="thumbnails"></div>
+            </div>
+        </div>
+    </div>
 
-    <script src="js/main.js"></script>
+    <!-- Review Modal -->
+    <div class="modal" id="reviewModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">Escribir Reseña</h2>
+                <button class="close-btn" onclick="closeModal('reviewModal')">&times;</button>
+            </div>
+            <form class="review-form" id="reviewForm" onsubmit="submitReview(event)">
+                <div class="form-group">
+                    <label class="form-label" for="ratingInput">Tu puntuación</label>
+                    <div class="rating-input" id="ratingInput">
+                        <span class="star-input" data-rating="1" onclick="setRating(1)">★</span>
+                        <span class="star-input" data-rating="2" onclick="setRating(2)">★</span>
+                        <span class="star-input" data-rating="3" onclick="setRating(3)">★</span>
+                        <span class="star-input" data-rating="4" onclick="setRating(4)">★</span>
+                        <span class="star-input" data-rating="5" onclick="setRating(5)">★</span>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="reviewerName">Tu nombre</label>
+                    <input type="text" class="form-input" id="reviewerName" placeholder="Ej: Juan P." required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="reviewText">Tu reseña</label>
+                    <textarea class="form-input form-textarea" id="reviewText" placeholder="Cuéntanos sobre tu experiencia..." required></textarea>
+                </div>
+                <div class="modal-actions">
+                    <button type="button" class="btn btn-secondary" onclick="closeModal('reviewModal')">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Publicar Reseña</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Review Success Modal -->
+    <div class="modal" id="reviewSuccessModal">
+        <div class="modal-content" style="max-width: 400px; text-align: center;">
+            <div style="font-size: 3rem; color: #10b981; margin-bottom: 20px;">
+                <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polyline points="20,6 9,17 4,12"/>
+                </svg>
+            </div>
+            <h2 style="color: #ffffff; margin-bottom: 15px; font-size: 1.5rem; font-weight: 700;">Reseña Publicada</h2>
+            <p style="color: rgba(255,255,255,0.8); margin-bottom: 30px; line-height: 1.6; font-size: 14px;">
+                Tu reseña ha sido publicada exitosamente. 
+                <br><br>
+                Gracias por compartir tu experiencia con otros usuarios.
+            </p>
+            <button class="btn btn-primary" onclick="closeModal('reviewSuccessModal')" style="padding: 12px 30px;">
+                Continuar
+            </button>
+        </div>
+    </div>
+
+    <script src="js/cancha-detalle.js"></script>
 </body>
 </html>
