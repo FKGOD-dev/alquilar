@@ -1,894 +1,350 @@
-// Variables globales
-let filtrosActivos = [];
-let todasLasCanchas = [];
-let currentSearchTerm = '';
+// ===== Utils / Tema =====
+const $  = (s) => document.querySelector(s);
+const $$ = (s, ctx=document) => ctx.querySelectorAll(s);
 
-// Base de datos de ubicaciones
-const ubicaciones = [
-    'Villa Crespo, CABA', 'Palermo, CABA', 'Belgrano, CABA', 'Recoleta, CABA',
-    'San Telmo, CABA', 'Barracas, CABA', 'Puerto Madero, CABA', 'Caballito, CABA',
-    'Flores, CABA', 'Almagro, CABA', 'Boedo, CABA', 'San Cristóbal, CABA',
-    'La Boca, CABA', 'Constitución, CABA', 'Monserrat, CABA', 'Retiro, CABA',
-    'Vicente López, GBA', 'San Isidro, GBA', 'Tigre, GBA', 'Olivos, GBA',
-    'Zona Norte, GBA', 'Zona Oeste, GBA', 'Zona Sur, GBA'
+function loadSavedTheme(){
+  const saved = localStorage.getItem('theme');
+  document.body.classList.toggle('light-mode', saved === 'light');
+
+  const btn = $('#themeToggle');
+  if (btn) {
+    btn.innerHTML = document.body.classList.contains('light-mode')
+      ? `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>`
+      : `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>`;
+  }
+
+  const header = document.querySelector('.header');
+  const onScroll = () => header?.classList.toggle('scrolled', window.scrollY > 6);
+  window.addEventListener('scroll', onScroll, {once:false});
+  onScroll();
+}
+function toggleTheme(){ const isLight = !document.body.classList.contains('light-mode'); localStorage.setItem('theme', isLight ? 'light' : 'dark'); loadSavedTheme(); }
+window.toggleTheme = toggleTheme;
+
+// ===== Datos =====
+const SPORTS = [
+  { id:'f5',    name:'Fútbol 5' },
+  { id:'padel', name:'Pádel' },
+  { id:'tenis', name:'Tenis' },
+  { id:'basquet', name:'Básquet' },
+];
+const FEATURES = [
+  {label:'Techada', value:'techada'},
+  {label:'Descubierta', value:'descubierta'},
+  {label:'Césped sintético', value:'cesped'},
+  {label:'Cristal', value:'cristal'},
+  {label:'Iluminación LED', value:'iluminacion'},
 ];
 
-// Filtros por deporte
-const filtrosPorDeporte = {
-    '': ['Césped', 'Césped Natural', 'Climatizada', 'Cristal', 'Luz', 'Parking', 'Parrilla', 'Profesores', 'Techada', 'Vestuarios'],
-    'futbol5': ['Césped', 'Parrilla', 'Vestuarios', 'Luz', 'Parking', 'Techada', 'Climatizada'],
-    'futbol7': ['Césped', 'Césped Natural', 'Vestuarios', 'Parking', 'Luz', 'Techada'],
-    'futbol11': ['Césped Natural', 'Vestuarios', 'Parking', 'Luz', 'Tribunas'],
-    'padel': ['Techada', 'Parking', 'Césped Natural', 'Cristal', 'Profesores', 'Climatizada'],
-    'tenis': ['Parking', 'Profesores', 'Climatizada', 'Cristal', 'Luz'],
-    'basquet': ['Techada', 'Parking', 'Climatizada', 'Vestuarios', 'Luz'],
-    'voley': ['Techada', 'Parking', 'Climatizada', 'Vestuarios', 'Luz']
+const COMPLEXES = [
+  { id:'cdc', name:'Complejo Deportivo Central', address:'Av. Corrientes 1234, Villa Crespo, CABA', barrio:'Villa Crespo', sports:['f5','padel','tenis','basquet'], features:['techada','cesped','cristal','iluminacion'], rating:4.2, reviews:47, img:'https://images.unsplash.com/photo-1546519638-68e109498ffc?q=80&w=1400&auto=format' },
+  { id:'pn',  name:'Parque Norte Club',          address:'Av. Cantilo 3215, Núñez, CABA',         barrio:'Núñez',        sports:['padel','tenis','f5'],          features:['descubierta','cristal','iluminacion'], rating:4.5, reviews:128, img:'https://images.unsplash.com/photo-1518602164577-365ea76149d2?q=80&w=1400&auto=format' },
+  { id:'villaolimpica', name:'Villa Olímpica Sports', address:'Av. Cruz 4600, Villa Soldati, CABA', barrio:'Villa Soldati', sports:['f5','basquet'], features:['techada','iluminacion'], rating:4.1, reviews:64, img:'https://images.unsplash.com/photo-1517649763962-0c623066013b?q=80&w=1400&auto=format' },
+];
+
+// ===== Estado =====
+const filter = {
+  locationText: '',
+  sport: 'all',
+  date: new Date(),
+  time: '11:00',
+  feature: null
 };
 
-// Funciones de tema
-function toggleTheme() {
-    const body = document.body;
-    const themeToggle = document.getElementById('themeToggle');
-    
-    body.classList.toggle('light-mode');
-    
-    if (body.classList.contains('light-mode')) {
-        themeToggle.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>';
-        localStorage.setItem('theme', 'light');
-    } else {
-        themeToggle.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>';
-        localStorage.setItem('theme', 'dark');
-    }
-}
+// ===== Helpers =====
+const $el = (tag, cls, html='') => { const e=document.createElement(tag); if(cls) e.className=cls; if(html) e.innerHTML=html; return e; };
+const pad = (n)=> String(n).padStart(2,'0');
 
-function loadSavedTheme() {
-    const savedTheme = localStorage.getItem('theme');
-    const themeToggle = document.getElementById('themeToggle');
-    
-    if (savedTheme === 'light') {
-        document.body.classList.add('light-mode');
-        themeToggle.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>';
-    } else {
-        themeToggle.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>';
-    }
-}
+// ===== Mini select (único abierto a la vez) =====
+function closeAllMini(){ $$('.select-mini.open').forEach(s=>{ s.classList.remove('open'); s.setAttribute('aria-expanded','false'); }); }
+document.addEventListener('click', (e)=>{ if(!e.target.closest('.select-mini') && !e.target.closest('.input-mini')) closeAllMini(); });
 
-// Autocompletado de ubicaciones
-function setupUbicacionAutocomplete() {
-    const input = document.getElementById('ubicacionInput');
-    const sugerencias = document.getElementById('ubicacionSugerencias');
-    let selectedIndex = -1;
-    
-    input.addEventListener('input', function() {
-        const valor = this.value.toLowerCase();
-        selectedIndex = -1;
-        
-        if (valor.length < 2) {
-            sugerencias.classList.remove('show');
-            return;
-        }
-        
-        const coincidencias = ubicaciones.filter(ubicacion => 
-            ubicacion.toLowerCase().includes(valor)
-        );
-        
-        if (coincidencias.length > 0) {
-            sugerencias.innerHTML = coincidencias
-                .slice(0, 6)
-                .map((ubicacion, index) => 
-                    `<div class="suggestion-item" data-index="${index}" onclick="seleccionarUbicacion('${ubicacion}')">${ubicacion}</div>`
-                )
-                .join('');
-            sugerencias.classList.add('show');
-        } else {
-            sugerencias.classList.remove('show');
-        }
+function buildMiniSelect({rootId, triggerId, menuId, valueId, options, onChange, initialIndex=0}){
+  const root = $(rootId), trigger = $(triggerId), menu = $(menuId), value = $(valueId);
+  if(!root) return;
+  value.textContent = options[initialIndex]?.label ?? '';
+  menu.innerHTML = '';
+
+  options.forEach((opt,i)=>{
+    const item = $el('div','mini-option' + (i===initialIndex?' active':''), opt.label);
+    item.setAttribute('role','option');
+    item.addEventListener('click',()=>{
+      menu.querySelectorAll('.mini-option').forEach(o=>o.classList.remove('active'));
+      item.classList.add('active');
+      value.textContent = opt.label;
+      onChange(opt,i);
+      root.classList.remove('open'); root.setAttribute('aria-expanded','false');
+      renderResults();
     });
-    
-    // Navegación con teclado
-    input.addEventListener('keydown', function(e) {
-        const items = sugerencias.querySelectorAll('.suggestion-item');
-        
-        if (e.key === 'ArrowDown') {
-            e.preventDefault();
-            selectedIndex = Math.min(selectedIndex + 1, items.length - 1);
-            updateSuggestionSelection(items);
-        } else if (e.key === 'ArrowUp') {
-            e.preventDefault();
-            selectedIndex = Math.max(selectedIndex - 1, -1);
-            updateSuggestionSelection(items);
-        } else if (e.key === 'Enter' && selectedIndex >= 0) {
-            e.preventDefault();
-            const selectedItem = items[selectedIndex];
-            if (selectedItem) {
-                seleccionarUbicacion(selectedItem.textContent);
-            }
-        } else if (e.key === 'Escape') {
-            sugerencias.classList.remove('show');
-            selectedIndex = -1;
-        }
+    menu.appendChild(item);
+  });
+
+  trigger.onclick = (e)=>{
+    e.stopPropagation();
+    const willOpen = !root.classList.contains('open');
+    closeAllMini();
+    if (willOpen){ root.classList.add('open'); root.setAttribute('aria-expanded','true'); }
+  };
+}
+
+// ===== Superbar =====
+const hours = Array.from({length:16},(_,i)=> `${pad(8+i)}:00`);
+const barrios = ['Villa Crespo','Núñez','Villa Soldati'];
+
+function buildSuperbar(){
+  // Deportes
+  const sportOpts = [{label:'Deportes', value:'all'}, ...SPORTS.map(s=>({label:s.name, value:s.id}))];
+  buildMiniSelect({
+    rootId:'#sportSelectTop', triggerId:'#sportTriggerTop', menuId:'#sportMenuTop', valueId:'#sportValueTop',
+    options:sportOpts, onChange:(opt)=>{ filter.sport = opt.value; }
+  });
+
+  // Hora
+  const timeOpts = hours.map(h=>({label:`${h}hs`, value:h}));
+  const initialHourIdx = hours.findIndex(h=>h==='11:00');
+  buildMiniSelect({
+    rootId:'#timeSelectTop', triggerId:'#timeTriggerTop', menuId:'#timeMenuTop', valueId:'#timeValueTop',
+    options:timeOpts, onChange:(opt)=>{ filter.time = opt.value; }, initialIndex: initialHourIdx>=0? initialHourIdx : 0
+  });
+
+  // Ubicación (live + clear)
+  const input = $('#locInput'), suggest = $('#locSuggest'), clear = $('#locClear');
+  function updateClear(){ input.parentElement.classList.toggle('has-text', !!input.value.trim()); }
+
+  input.addEventListener('input', ()=>{
+    filter.locationText = input.value.trim();
+    updateClear();
+
+    // sugerencias
+    const q = input.value.trim().toLowerCase();
+    const list = q ? barrios.filter(b=> b.toLowerCase().includes(q)) : [];
+    suggest.innerHTML = list.map(b=> `<div class="suggest-item">${b}</div>`).join('');
+    input.parentElement.classList.toggle('open', list.length>0);
+
+    // filtra en vivo
+    renderResults();
+  });
+
+  suggest.addEventListener('click', (e)=>{
+    const it = e.target.closest('.suggest-item'); if(!it) return;
+    input.value = it.textContent; filter.locationText = it.textContent;
+    suggest.innerHTML=''; input.parentElement.classList.remove('open'); updateClear(); renderResults();
+  });
+
+  clear.addEventListener('click', ()=>{
+    input.value = ''; filter.locationText = '';
+    suggest.innerHTML=''; input.parentElement.classList.remove('open'); updateClear(); renderResults();
+  });
+  updateClear();
+
+  // Calendario
+  initCalendar();
+
+  // CTA
+  $('#doSearch').onclick = ()=>{
+    renderResults();
+    $('#resultsGrid')?.scrollIntoView({behavior:'smooth', block:'start'});
+  };
+}
+
+// ===== Calendario =====
+let calCursor = new Date(new Date().setDate(1));
+
+function initCalendar(){
+  $('#dateTriggerTop').addEventListener('click',(e)=>{
+    e.stopPropagation();
+    const root = $('#dateSelectTop');
+    const willOpen = !root.classList.contains('open');
+    closeAllMini();
+    if (willOpen){ root.classList.add('open'); root.setAttribute('aria-expanded','true'); }
+  });
+  $('#calPrev').addEventListener('click', ()=>{ calCursor.setMonth(calCursor.getMonth()-1); buildCalendar(); });
+  $('#calNext').addEventListener('click', ()=>{ calCursor.setMonth(calCursor.getMonth()+1); buildCalendar(); });
+  buildCalendar();
+}
+function buildCalendar(){
+  const monthName = calCursor.toLocaleDateString('es-AR',{month:'long', year:'numeric'});
+  $('#calTitle').textContent = monthName.charAt(0).toUpperCase()+monthName.slice(1);
+  const grid = $('#calGrid'); grid.innerHTML='';
+
+  const week = ['L','M','M','J','V','S','D']; week.forEach(w => grid.appendChild($el('div','cal-week', w)));
+
+  const first = new Date(calCursor);
+  const startDay = (first.getDay()+6)%7;
+  const daysInMonth = new Date(calCursor.getFullYear(), calCursor.getMonth()+1, 0).getDate();
+  const prevMonthDays = new Date(calCursor.getFullYear(), calCursor.getMonth(), 0).getDate();
+
+  for(let i=startDay-1; i>=0; i--) grid.appendChild($el('div','cal-day muted', prevMonthDays - i));
+
+  const today = new Date(); today.setHours(0,0,0,0);
+  for(let d=1; d<=daysInMonth; d++){
+    const dateObj = new Date(calCursor.getFullYear(), calCursor.getMonth(), d);
+    const cell = $el('div','cal-day', d);
+    if (+dateObj === +new Date(filter.date.getFullYear(), filter.date.getMonth(), filter.date.getDate())) cell.classList.add('selected');
+    if (+dateObj === +today) cell.classList.add('today');
+    cell.addEventListener('click', ()=>{
+      filter.date = dateObj;
+      const isToday = +dateObj === +today;
+      $('#dateValueTop').textContent = isToday
+        ? 'Hoy'
+        : dateObj.toLocaleDateString('es-AR',{weekday:'short', day:'2-digit', month:'2-digit'});
+      $('#dateSelectTop').classList.remove('open');
+      renderResults();
     });
-    
-    // Cerrar sugerencias al hacer clic fuera
-    document.addEventListener('click', function(e) {
-        if (!input.contains(e.target) && !sugerencias.contains(e.target)) {
-            sugerencias.classList.remove('show');
-            selectedIndex = -1;
-        }
-    });
+    grid.appendChild(cell);
+  }
+  const totalCells = week.length + startDay + daysInMonth;
+  const rest = (7 - (totalCells % 7)) % 7;
+  for(let i=1; i<=rest; i++) grid.appendChild($el('div','cal-day muted', i));
 }
 
-function updateSuggestionSelection(items) {
-    items.forEach((item, index) => {
-        if (index === selectedIndex) {
-            item.classList.add('selected');
-        } else {
-            item.classList.remove('selected');
-        }
-    });
-}
-
-function seleccionarUbicacion(ubicacion) {
-    document.getElementById('ubicacionInput').value = ubicacion;
-    document.getElementById('ubicacionSugerencias').classList.remove('show');
-    // Aplicar filtros automáticamente
-    aplicarFiltros();
-}
-
-// Actualizar filtros según deporte seleccionado
-function actualizarFiltros() {
-    const deporte = document.getElementById('deporteSelect').value;
-    const filtrosContainer = document.getElementById('filtrosContainer');
-    
-    const filtrosDisponibles = filtrosPorDeporte[deporte] || filtrosPorDeporte[''];
-    
-    let filtrosHTML = '<span class="filters-label">Filtros:</span>';
-    filtrosHTML += filtrosDisponibles.map(filtro => {
-        const isActive = filtrosActivos.includes(filtro);
-        return `<span class="filter-tag ${isActive ? 'active' : ''}" onclick="toggleFiltro('${filtro}')">${filtro}</span>`;
-    }).join('');
-    
-    if (filtrosActivos.length > 0) {
-        filtrosHTML += '<button class="clear-filters" onclick="limpiarFiltros()">Limpiar filtros</button>';
-    }
-    
-    filtrosContainer.innerHTML = filtrosHTML;
-}
-
-function toggleFiltro(filtro) {
-    const index = filtrosActivos.indexOf(filtro);
-    if (index > -1) {
-        filtrosActivos.splice(index, 1);
-    } else {
-        filtrosActivos.push(filtro);
-    }
-    
-    actualizarFiltros();
-    aplicarFiltros();
-}
-
-function limpiarFiltros() {
-    filtrosActivos = [];
-    actualizarFiltros();
-    aplicarFiltros();
-}
-
-// Realizar búsqueda
-function realizarBusqueda(event) {
-    event.preventDefault();
-    aplicarFiltros();
-}
-
-function aplicarFiltros() {
-    const ubicacion = document.getElementById('ubicacionInput').value.toLowerCase();
-    const fecha = document.getElementById('fechaInput').value;
-    const deporte = document.getElementById('deporteSelect').value;
-    
-    currentSearchTerm = ubicacion;
-    
-    const canchas = document.querySelectorAll('.cancha-card');
-    let canchasVisibles = 0;
-    
-    canchas.forEach(cancha => {
-        let mostrar = true;
-        
-        // Filtro por ubicación
-        if (ubicacion && !cancha.querySelector('.cancha-location').textContent.toLowerCase().includes(ubicacion)) {
-            mostrar = false;
-        }
-        
-        // Filtro por deporte
-        if (deporte && cancha.dataset.deporte !== deporte) {
-            mostrar = false;
-        }
-        
-        // Filtros específicos
-        if (filtrosActivos.length > 0) {
-            const caracteristicasCancha = Array.from(cancha.querySelectorAll('.feature-tag')).map(tag => tag.textContent);
-            const tieneCaracteristicas = filtrosActivos.every(filtro => 
-                caracteristicasCancha.some(caracteristica => 
-                    caracteristica.toLowerCase().includes(filtro.toLowerCase()) ||
-                    filtro.toLowerCase().includes(caracteristica.toLowerCase())
-                )
-            );
-            
-            if (!tieneCaracteristicas) {
-                mostrar = false;
-            }
-        }
-        
-        // Aplicar animación de entrada/salida
-        if (mostrar !== (cancha.style.display !== 'none')) {
-            if (mostrar) {
-                cancha.style.display = 'block';
-                cancha.style.opacity = '0';
-                cancha.style.transform = 'translateY(20px)';
-                setTimeout(() => {
-                    cancha.style.transition = 'all 0.3s ease';
-                    cancha.style.opacity = '1';
-                    cancha.style.transform = 'translateY(0)';
-                }, 50);
-            } else {
-                cancha.style.transition = 'all 0.3s ease';
-                cancha.style.opacity = '0';
-                cancha.style.transform = 'translateY(-10px)';
-                setTimeout(() => {
-                    cancha.style.display = 'none';
-                }, 300);
-            }
-        }
-        
-        if (mostrar) canchasVisibles++;
-    });
-    
-    // Mostrar/ocultar mensaje de sin resultados
-    mostrarSinResultados(canchasVisibles === 0);
-    
-    // Actualizar contador de resultados
-    actualizarContadorResultados(canchasVisibles);
-}
-
-function mostrarSinResultados(mostrar) {
-    const noResults = document.getElementById('noResults');
-    const resultsContainer = document.getElementById('resultsContainer');
-    
-    if (mostrar) {
-        noResults.style.display = 'block';
-        resultsContainer.style.opacity = '0.3';
-    } else {
-        noResults.style.display = 'none';
-        resultsContainer.style.opacity = '1';
-    }
-}
-
-function actualizarContadorResultados(count) {
-    const resultsTitle = document.querySelector('.results-title');
-    if (!resultsTitle) {
-        // Crear el título si no existe
-        const header = document.querySelector('.results-header');
-        const title = document.createElement('h2');
-        title.className = 'results-title';
-        header.insertBefore(title, header.firstChild);
-    }
-    
-    const title = document.querySelector('.results-title');
-    if (count === 0) {
-        title.textContent = 'Resultados';
-    } else if (count === 1) {
-        title.textContent = '1 resultado encontrado';
-    } else {
-        title.textContent = `${count} resultados encontrados`;
-    }
-}
-
-// Ordenar resultados
-function ordenarResultados(criterio) {
-    const container = document.getElementById('resultsContainer');
-    const canchas = Array.from(container.querySelectorAll('.cancha-card')).filter(cancha => 
-        cancha.style.display !== 'none'
-    );
-    
-    canchas.sort((a, b) => {
-        switch(criterio) {
-            case 'precio-menor':
-                return parseInt(a.dataset.precio) - parseInt(b.dataset.precio);
-            case 'precio-mayor':
-                return parseInt(b.dataset.precio) - parseInt(a.dataset.precio);
-            case 'rating':
-                return parseFloat(b.dataset.rating || 0) - parseFloat(a.dataset.rating || 0);
-            case 'distancia': {
-                // Simulación de distancia basada en orden alfabético de ubicación
-                const locationA = a.querySelector('.cancha-location').textContent;
-                const locationB = b.querySelector('.cancha-location').textContent;
-                return locationA.localeCompare(locationB);
-            }
-            case 'relevancia':
-            default: {
-                // Ordenar por relevancia (combinando rating y coincidencia de búsqueda)
-                const ratingA = parseFloat(a.dataset.rating || 0);
-                const ratingB = parseFloat(b.dataset.rating || 0);
-                
-                // Bonus por coincidencia de ubicación
-                const locationA = a.querySelector('.cancha-location').textContent.toLowerCase();
-                const locationB = b.querySelector('.cancha-location').textContent.toLowerCase();
-                const bonusA = currentSearchTerm && locationA.includes(currentSearchTerm) ? 1 : 0;
-                const bonusB = currentSearchTerm && locationB.includes(currentSearchTerm) ? 1 : 0;
-                
-                const scoreA = ratingA + bonusA;
-                const scoreB = ratingB + bonusB;
-                
-                return scoreB - scoreA;
-            }
-        }
-    });
-    
-    // Reordenar en el DOM con animación
-    canchas.forEach((cancha, index) => {
-        setTimeout(() => {
-            container.appendChild(cancha);
-        }, index * 50);
-    });
-}
-
-function verDetalles(canchaId) {
-    // Agregar efecto de loading
-    const card = event.currentTarget;
-    card.style.transform = 'scale(0.98)';
-    card.style.opacity = '0.7';
-    
-    setTimeout(() => {
-        window.location.href = `cancha-${canchaId}.html`;
-    }, 150);
-}
-
-// Configurar fecha mínima (hoy)
-function configurarFecha() {
-    const fechaInput = document.getElementById('fechaInput');
-    const hoy = new Date().toISOString().split('T')[0];
-    fechaInput.min = hoy;
-    fechaInput.value = hoy;
-}
-
-// Función para detectar cambios en tiempo real
-function setupRealTimeSearch() {
-    const ubicacionInput = document.getElementById('ubicacionInput');
-    const deporteSelect = document.getElementById('deporteSelect');
-    
-    let searchTimeout;
-    
-    ubicacionInput.addEventListener('input', function() {
-        clearTimeout(searchTimeout);
-        searchTimeout = setTimeout(() => {
-            aplicarFiltros();
-        }, 300);
-    });
-    
-    deporteSelect.addEventListener('change', function() {
-        actualizarFiltros();
-        aplicarFiltros();
-    });
-}
-
-// Funciones de analytics y tracking
-function trackSearch(filters) {
-    console.log('Búsqueda realizada:', {
-        ubicacion: document.getElementById('ubicacionInput').value,
-        deporte: document.getElementById('deporteSelect').value,
-        filtros: filtrosActivos,
-        timestamp: new Date().toISOString()
-    });
-}
-
-function trackCanchaClick(canchaId) {
-    console.log('Cancha seleccionada:', {
-        canchaId,
-        searchContext: {
-            ubicacion: document.getElementById('ubicacionInput').value,
-            deporte: document.getElementById('deporteSelect').value,
-            filtros: filtrosActivos
-        },
-        timestamp: new Date().toISOString()
-    });
-}
-
-// Función para precargar datos
-function preloadCanchaData() {
-    // Simular precarga de datos adicionales
-    todasLasCanchas = Array.from(document.querySelectorAll('.cancha-card'));
-    
-    // Agregar datos adicionales a cada cancha si no existen
-    todasLasCanchas.forEach((cancha, index) => {
-        if (!cancha.dataset.rating) {
-            cancha.dataset.rating = (3.5 + Math.random() * 1.5).toFixed(1);
-        }
-        if (!cancha.dataset.precio) {
-            const priceText = cancha.querySelector('.price').textContent;
-            const precio = priceText.match(/\d+/);
-            if (precio) {
-                cancha.dataset.precio = precio[0];
-            }
-        }
-    });
-}
-
-// Función para manejar errores de red
-function handleNetworkError() {
-    console.warn('Error de conexión detectado');
-    // En una aplicación real, aquí se manejarían errores de API
-}
-
-// Setup de eventos globales
-function setupGlobalEvents() {
-    // Manejar cambio de tamaño de ventana
-    let resizeTimeout;
-    window.addEventListener('resize', () => {
-        clearTimeout(resizeTimeout);
-        resizeTimeout = setTimeout(() => {
-            // Reajustar layout si es necesario
-            console.log('Layout reajustado para nueva resolución');
-        }, 250);
-    });
-    
-    // Manejar navegación con teclado
-    document.addEventListener('keydown', (e) => {
-        if (e.key === 'Escape') {
-            // Cerrar cualquier dropdown abierto
-            document.querySelectorAll('.suggestions-dropdown').forEach(dropdown => {
-                dropdown.classList.remove('show');
-            });
-        }
-    });
-    
-    // Lazy loading para imágenes (si se agregan después)
-    const imageObserver = new IntersectionObserver((entries) => {
-        entries.forEach(entry => {
-            if (entry.isIntersecting) {
-                const img = entry.target;
-                if (img.dataset.src) {
-                    img.src = img.dataset.src;
-                    img.removeAttribute('data-src');
-                    imageObserver.unobserve(img);
-                }
-            }
-        });
-    });
-    
-    // Observar futuras imágenes
-    document.querySelectorAll('img[data-src]').forEach(img => {
-        imageObserver.observe(img);
-    });
-}
-
-// Función de inicialización mejorada
-function initializeApp() {
-    console.log('Inicializando aplicación de búsqueda de canchas...');
-    
-    try {
-        // Cargar configuraciones
-        loadSavedTheme();
-        configurarFecha();
-        
-        // Setup de funcionalidades
-        setupUbicacionAutocomplete();
-        setupRealTimeSearch();
-        setupGlobalEvents();
-        
-        // Precargar datos
-        preloadCanchaData();
-        
-        // Inicializar filtros
-        filtrosActivos = [];
-        actualizarFiltros();
-        
-        // Mostrar todos los resultados inicialmente
-        aplicarFiltros();
-        
-        console.log('Aplicación inicializada correctamente');
-        
-    } catch (error) {
-        console.error('Error al inicializar la aplicación:', error);
-        handleNetworkError();
-    }
-}
-
-// Funciones adicionales de UI
-function addLoadingState(element) {
-    element.style.opacity = '0.6';
-    element.style.pointerEvents = 'none';
-    
-    const spinner = document.createElement('div');
-    spinner.className = 'loading-spinner';
-    spinner.style.cssText = `
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        width: 20px;
-        height: 20px;
-        border: 2px solid rgba(255,255,255,0.3);
-        border-radius: 50%;
-        border-top-color: #10b981;
-        animation: spin 1s ease-in-out infinite;
-    `;
-    
-    element.style.position = 'relative';
-    element.appendChild(spinner);
-    
-    // Agregar keyframes si no existen
-    if (!document.querySelector('#spinner-styles')) {
-        const style = document.createElement('style');
-        style.id = 'spinner-styles';
-        style.textContent = `
-            @keyframes spin {
-                to { transform: translate(-50%, -50%) rotate(360deg); }
-            }
-        `;
-        document.head.appendChild(style);
-    }
-}
-
-function removeLoadingState(element) {
-    element.style.opacity = '1';
-    element.style.pointerEvents = 'auto';
-    const spinner = element.querySelector('.loading-spinner');
-    if (spinner) {
-        spinner.remove();
-    }
-}
-
-// Función para mostrar notificaciones
-function showNotification(message, type = 'info', duration = 4000) {
-    const notification = document.createElement('div');
-    notification.className = `notification notification-${type}`;
-    
-    const colors = {
-        info: '#3b82f6',
-        success: '#10b981',
-        warning: '#f59e0b',
-        error: '#ef4444'
+// ===== Chips rápidos =====
+function buildQuickFilters(){
+  const wrap = $('#featureChips'); wrap.innerHTML='';
+  FEATURES.forEach(f=>{
+    const chip = $el('button','filter-chip', f.label);
+    chip.onclick = ()=>{
+      wrap.querySelectorAll('.filter-chip').forEach(c=>c.classList.remove('active'));
+      if (filter.feature===f.value) {
+        filter.feature=null;
+        updateFiltersActions(false);
+      } else {
+        filter.feature=f.value;
+        chip.classList.add('active');
+        updateFiltersActions(true);
+      }
+      renderResults();
     };
-    
-    notification.style.cssText = `
-        position: fixed;
-        top: 20px;
-        right: 20px;
-        padding: 12px 20px;
-        border-radius: 8px;
-        color: white;
-        font-weight: 600;
-        font-size: 14px;
-        z-index: 9999;
-        max-width: 400px;
-        background: ${colors[type] || colors.info};
-        backdrop-filter: blur(10px);
-        border: 1px solid rgba(255,255,255,0.2);
-        transform: translateX(100%);
-        transition: transform 0.3s ease;
-        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-    `;
-    
-    notification.textContent = message;
-    document.body.appendChild(notification);
-    
-    // Animar entrada
-    requestAnimationFrame(() => {
-        notification.style.transform = 'translateX(0)';
+    wrap.appendChild(chip);
+  });
+  updateFiltersActions(false);
+}
+function updateFiltersActions(show){
+  const actions = $('#filtersActions');
+  actions.classList.toggle('show', !!show);
+  $('#clearChips').onclick = ()=>{
+    filter.feature=null;
+    $('#featureChips').querySelectorAll('.filter-chip').forEach(c=>c.classList.remove('active'));
+    updateFiltersActions(false);
+    renderResults();
+  };
+}
+
+// ===== Filtros =====
+function passLocation(c){
+  const q = filter.locationText.trim().toLowerCase();
+  if (!q) return true;
+  return c.barrio.toLowerCase().includes(q) || c.address.toLowerCase().includes(q);
+}
+const passSport   = (c)=> filter.sport==='all' || c.sports.includes(filter.sport);
+const passFeature = (c)=> !filter.feature || c.features?.includes(filter.feature);
+
+// ===== Navegación =====
+function goToDetails(id){
+  const qs = new URLSearchParams();
+  if (filter.sport!=='all') qs.set('deporte', filter.sport);
+  window.location.href = `cancha-detalle.html?club=${encodeURIComponent(id)}&${qs.toString()}`;
+}
+
+// ===== Render =====
+function emptyState(){
+  const box = $el('div','empty-center');
+  box.innerHTML = `
+    <div class="icon">
+      <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" style="opacity:.9">
+        <circle cx="11" cy="11" r="7"/><path d="m21 21-4.35-4.35"/>
+      </svg>
+    </div>
+    <div class="title">Sin resultados</div>
+    <div class="sub">No encontramos complejos con esos filtros.</div>
+  `;
+  return box;
+}
+
+function renderResults(){
+  const wrap = $('#resultsWrap');
+  wrap.classList.remove('is-empty');
+  wrap.innerHTML = `<div class="results-grid reveal" id="resultsGrid"></div>`;
+  const grid = $('#resultsGrid');
+
+  const list = COMPLEXES.filter(c => passLocation(c) && passSport(c) && passFeature(c));
+
+  if (!list.length){
+    wrap.classList.add('is-empty');
+    wrap.innerHTML = '';
+    wrap.appendChild(emptyState());
+    return;
+  }
+
+  list.forEach(c=>{
+    const card = $el('article','result-card reveal');
+
+    const cover = $el('div','result-cover');
+    const img = new Image(); img.src = c.img; img.alt = c.name; cover.appendChild(img);
+
+    const body  = $el('div','result-body');
+    const title = $el('h3','result-title', c.name);
+
+    const addrBtn = $el('button','address-chip', `
+      <span class="chip-icon">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M12 21s-6-5.33-6-10a6 6 0 0 1 12 0c0 4.67-6 10-6 10z"/><circle cx="12" cy="11" r="2.5"/>
+        </svg>
+      </span>
+      <span class="chip-text">${c.address}</span>
+    `);
+    addrBtn.onclick = (ev)=>{ ev.stopPropagation(); window.open(`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(c.address)}`,'_blank'); };
+
+    const tags = $el('div','tags');
+    c.sports.slice(0,3).forEach(id=>{
+      const name = SPORTS.find(s=>s.id===id)?.name || id;
+      const t = $el('span','tag', name);
+      t.onclick = (ev)=>{ ev.stopPropagation(); filter.sport=id; renderResults(); window.scrollTo({top:0,behavior:'smooth'}); };
+      tags.appendChild(t);
     });
-    
-    // Auto-remove
-    setTimeout(() => {
-        notification.style.transform = 'translateX(100%)';
-        setTimeout(() => {
-            if (notification.parentNode) {
-                document.body.removeChild(notification);
-            }
-        }, 300);
-    }, duration);
-    
-    return notification;
-}
-
-// Funciones mejoradas de interacción
-function handleCanchaHover(card) {
-    card.addEventListener('mouseenter', function() {
-        this.style.transform = 'translateY(-6px)';
-        this.style.boxShadow = '0 8px 25px rgba(16, 185, 129, 0.2)';
+    c.features.slice(0,2).forEach(f=>{
+      const label = FEATURES.find(x=>x.value===f)?.label || f;
+      const t = $el('span','tag', label);
+      t.onclick = (ev)=>{ ev.stopPropagation(); filter.feature=f; updateFiltersActions(true); renderResults(); window.scrollTo({top:0,behavior:'smooth'}); };
+      tags.appendChild(t);
     });
-    
-    card.addEventListener('mouseleave', function() {
-        this.style.transform = 'translateY(0)';
-        this.style.boxShadow = '';
-    });
+
+    const footer = $el('div','card-footer');
+    const ratingWrap = $el('div','rating-wrap');
+    const stars = $el('span','stars'); const r = Math.round(c.rating);
+    stars.innerHTML = '★★★★★'.split('').map((_,i)=>`<span class="star ${i<r?'filled':''}">★</span>`).join('');
+    const number = $el('span','rating-number', `${c.rating.toFixed(1)} (${c.reviews})`);
+    ratingWrap.appendChild(stars); ratingWrap.appendChild(number);
+
+    const btn = $el('button','btn-ghost','Ver detalles');
+    btn.onclick = (ev)=>{ ev.stopPropagation(); goToDetails(c.id); };
+
+    body.appendChild(title); body.appendChild(addrBtn); body.appendChild(tags);
+    footer.appendChild(ratingWrap); footer.appendChild(btn);
+
+    card.appendChild(cover); card.appendChild(body); body.appendChild(footer);
+    card.addEventListener('click', ()=> goToDetails(c.id));
+
+    grid.appendChild(card);
+  });
+
+  // reveal on scroll
+  const io = new IntersectionObserver((entries)=>{
+    entries.forEach(e=>{ if(e.isIntersecting){ e.target.classList.add('is-visible'); io.unobserve(e.target); } });
+  },{threshold:.15});
+  $$('.reveal').forEach(el=> io.observe(el));
 }
 
-function setupAdvancedFiltering() {
-    // Configurar filtrado por rango de precios
-    const priceRange = document.createElement('div');
-    priceRange.className = 'price-range-filter';
-    priceRange.innerHTML = `
-        <label class="form-label">Rango de precio</label>
-        <div style="display: flex; gap: 10px; align-items: center;">
-            <input type="number" id="precioMin" placeholder="Min" style="width: 80px; padding: 6px 8px; border: 1px solid rgba(255,255,255,0.2); border-radius: 4px; background: rgba(255,255,255,0.1); color: white; font-size: 12px;">
-            <span style="color: rgba(255,255,255,0.5);">-</span>
-            <input type="number" id="precioMax" placeholder="Max" style="width: 80px; padding: 6px 8px; border: 1px solid rgba(255,255,255,0.2); border-radius: 4px; background: rgba(255,255,255,0.1); color: white; font-size: 12px;">
-        </div>
-    `;
-    
-    // Agregar después de los filtros existentes
-    const filtrosContainer = document.getElementById('filtrosContainer');
-    if (filtrosContainer) {
-        filtrosContainer.appendChild(priceRange);
-        
-        // Event listeners para filtro de precio
-        document.getElementById('precioMin')?.addEventListener('input', debounce(aplicarFiltros, 500));
-        document.getElementById('precioMax')?.addEventListener('input', debounce(aplicarFiltros, 500));
-    }
-}
+// ===== Init =====
+document.addEventListener('DOMContentLoaded', ()=>{
+  loadSavedTheme();
+  buildSuperbar();
+  buildQuickFilters();
 
-function debounce(func, wait) {
-    let timeout;
-    return function executedFunction(...args) {
-        const later = () => {
-            clearTimeout(timeout);
-            func(...args);
-        };
-        clearTimeout(timeout);
-        timeout = setTimeout(later, wait);
-    };
-}
+  // Preselección (?deporte=padel)
+  const params = new URLSearchParams(location.search);
+  const d = params.get('deporte');
+  if (d && SPORTS.some(s=>s.id===d)){ filter.sport = d; $('#sportValueTop').textContent = SPORTS.find(s=>s.id===d).name; }
 
-// Función mejorada de aplicar filtros con rango de precio
-function aplicarFiltrosAvanzados() {
-    const ubicacion = document.getElementById('ubicacionInput').value.toLowerCase();
-    const fecha = document.getElementById('fechaInput').value;
-    const deporte = document.getElementById('deporteSelect').value;
-    const precioMin = document.getElementById('precioMin')?.value;
-    const precioMax = document.getElementById('precioMax')?.value;
-    
-    currentSearchTerm = ubicacion;
-    
-    const canchas = document.querySelectorAll('.cancha-card');
-    let canchasVisibles = 0;
-    
-    canchas.forEach(cancha => {
-        let mostrar = true;
-        
-        // Filtro por ubicación
-        if (ubicacion && !cancha.querySelector('.cancha-location').textContent.toLowerCase().includes(ubicacion)) {
-            mostrar = false;
-        }
-        
-        // Filtro por deporte
-        if (deporte && cancha.dataset.deporte !== deporte) {
-            mostrar = false;
-        }
-        
-        // Filtro por rango de precio
-        const precio = parseInt(cancha.dataset.precio);
-        if (precioMin && precio < parseInt(precioMin)) {
-            mostrar = false;
-        }
-        if (precioMax && precio > parseInt(precioMax)) {
-            mostrar = false;
-        }
-        
-        // Filtros específicos
-        if (filtrosActivos.length > 0) {
-            const caracteristicasCancha = Array.from(cancha.querySelectorAll('.feature-tag')).map(tag => tag.textContent);
-            const tieneCaracteristicas = filtrosActivos.every(filtro => 
-                caracteristicasCancha.some(caracteristica => 
-                    caracteristica.toLowerCase().includes(filtro.toLowerCase()) ||
-                    filtro.toLowerCase().includes(caracteristica.toLowerCase())
-                )
-            );
-            
-            if (!tieneCaracteristicas) {
-                mostrar = false;
-            }
-        }
-        
-        // Aplicar animación de entrada/salida
-        if (mostrar !== (cancha.style.display !== 'none')) {
-            if (mostrar) {
-                cancha.style.display = 'block';
-                cancha.style.opacity = '0';
-                cancha.style.transform = 'translateY(20px)';
-                setTimeout(() => {
-                    cancha.style.transition = 'all 0.3s ease';
-                    cancha.style.opacity = '1';
-                    cancha.style.transform = 'translateY(0)';
-                }, 50);
-            } else {
-                cancha.style.transition = 'all 0.3s ease';
-                cancha.style.opacity = '0';
-                cancha.style.transform = 'translateY(-10px)';
-                setTimeout(() => {
-                    cancha.style.display = 'none';
-                }, 300);
-            }
-        }
-        
-        if (mostrar) canchasVisibles++;
-    });
-    
-    // Mostrar/ocultar mensaje de sin resultados
-    mostrarSinResultados(canchasVisibles === 0);
-    
-    // Actualizar contador de resultados
-    actualizarContadorResultados(canchasVisibles);
-    
-    // Track search analytics
-    trackSearch({
-        ubicacion,
-        deporte,
-        filtrosActivos,
-        precioMin,
-        precioMax,
-        resultados: canchasVisibles
-    });
-}
-
-// Función para guardar búsquedas recientes
-function saveRecentSearch() {
-    const ubicacion = document.getElementById('ubicacionInput').value;
-    const deporte = document.getElementById('deporteSelect').value;
-    
-    if (ubicacion || deporte) {
-        let recentSearches = JSON.parse(localStorage.getItem('recentSearches') || '[]');
-        
-        const newSearch = {
-            ubicacion,
-            deporte,
-            timestamp: Date.now()
-        };
-        
-        // Evitar duplicados
-        recentSearches = recentSearches.filter(search => 
-            !(search.ubicacion === ubicacion && search.deporte === deporte)
-        );
-        
-        recentSearches.unshift(newSearch);
-        recentSearches = recentSearches.slice(0, 5); // Mantener solo 5 búsquedas recientes
-        
-        localStorage.setItem('recentSearches', JSON.stringify(recentSearches));
-    }
-}
-
-// Función para cargar búsquedas recientes
-function loadRecentSearches() {
-    const recentSearches = JSON.parse(localStorage.getItem('recentSearches') || '[]');
-    
-    if (recentSearches.length > 0) {
-        const searchSection = document.querySelector('.search-section');
-        const recentContainer = document.createElement('div');
-        recentContainer.className = 'recent-searches';
-        recentContainer.innerHTML = `
-            <div style="margin-top: 20px; padding-top: 20px; border-top: 1px solid rgba(255,255,255,0.1);">
-                <span style="color: rgba(255,255,255,0.8); font-size: 14px; font-weight: 600;">Búsquedas recientes:</span>
-                <div style="display: flex; gap: 8px; margin-top: 10px; flex-wrap: wrap;">
-                    ${recentSearches.map(search => `
-                        <button class="recent-search-btn" onclick="loadRecentSearch('${search.ubicacion}', '${search.deporte}')" 
-                                style="padding: 6px 12px; background: rgba(16, 185, 129, 0.2); border: 1px solid rgba(16, 185, 129, 0.3); border-radius: 4px; color: #10b981; font-size: 12px; cursor: pointer; transition: all 0.2s ease;">
-                            ${search.ubicacion || 'Todas las ubicaciones'} ${search.deporte ? `• ${search.deporte}` : ''}
-                        </button>
-                    `).join('')}
-                </div>
-            </div>
-        `;
-        
-        searchSection.appendChild(recentContainer);
-    }
-}
-
-function loadRecentSearch(ubicacion, deporte) {
-    document.getElementById('ubicacionInput').value = ubicacion || '';
-    document.getElementById('deporteSelect').value = deporte || '';
-    
-    if (deporte) {
-        actualizarFiltros();
-    }
-    
-    aplicarFiltros();
-    showNotification('Búsqueda cargada', 'success', 2000);
-}
-
-// Función de inicialización completa
-function initializeApp() {
-    console.log('Inicializando aplicación de búsqueda de canchas...');
-    
-    try {
-        // Cargar configuraciones
-        loadSavedTheme();
-        configurarFecha();
-        
-        // Setup de funcionalidades
-        setupUbicacionAutocomplete();
-        setupRealTimeSearch();
-        setupGlobalEvents();
-        setupAdvancedFiltering();
-        
-        // Precargar datos
-        preloadCanchaData();
-        
-        // Configurar efectos de hover para las tarjetas
-        document.querySelectorAll('.cancha-card').forEach(handleCanchaHover);
-        
-        // Inicializar filtros
-        filtrosActivos = [];
-        actualizarFiltros();
-        
-        // Cargar búsquedas recientes
-        loadRecentSearches();
-        
-        // Mostrar todos los resultados inicialmente
-        aplicarFiltros();
-        
-        // Override aplicarFiltros con la versión avanzada
-        window.aplicarFiltros = aplicarFiltrosAvanzados;
-        
-        console.log('Aplicación inicializada correctamente');
-        showNotification('Sistema de búsqueda listo', 'success', 3000);
-        
-    } catch (error) {
-        console.error('Error al inicializar la aplicación:', error);
-        showNotification('Error al cargar el sistema', 'error', 5000);
-        handleNetworkError();
-    }
-}
-
-// Función mejorada para ver detalles
-function verDetalles(canchaId) {
-    const card = event.currentTarget;
-    
-    // Agregar efecto de loading
-    addLoadingState(card);
-    
-    // Guardar búsqueda reciente
-    saveRecentSearch();
-    
-    // Track click
-    trackCanchaClick(canchaId);
-    
-    // Mapear IDs a archivos HTML correctos
-    const rutasCanchas = {
-        'cancha1': 'cancha-detalle.html',
-        'cancha2': 'cancha-cancha2.html',
-        'cancha3': 'cancha-cancha3.html',
-        'cancha4': 'cancha-cancha4.html',
-        'cancha5': 'cancha-cancha5.html',
-        'cancha6': 'cancha-cancha6.html',
-        'cancha7': 'cancha-cancha7.html',
-        'cancha8': 'cancha-cancha8.html',
-        'cancha9': 'cancha-cancha9.html'
-    };
-    
-    const rutaDestino = rutasCanchas[canchaId] || 'cancha-cancha1.html';
-    
-    // Simular carga y navegación
-    setTimeout(() => {
-        removeLoadingState(card);
-        window.location.href = rutaDestino;
-    }, 300);
-}
-
-// Event listener principal
-document.addEventListener('DOMContentLoaded', initializeApp);
-
-// Manejar errores globales
-window.addEventListener('error', function(e) {
-    console.error('Error global capturado:', e.error);
-    showNotification('Ha ocurrido un error inesperado', 'error', 5000);
+  renderResults();
 });
-
-// Exportar funciones para testing (si es necesario)
-if (typeof module !== 'undefined' && module.exports) {
-    module.exports = {
-        aplicarFiltros: aplicarFiltrosAvanzados,
-        ordenarResultados,
-        toggleFiltro,
-        limpiarFiltros,
-        showNotification,
-        saveRecentSearch,
-        loadRecentSearch
-    };
-}
