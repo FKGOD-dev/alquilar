@@ -10,16 +10,29 @@
     <header class="header">
         <div class="nav-container">
             <div class="logo" onclick="window.location.href='index.html'">
-                <div class="logo-icon">⚽</div>
+                <div class="logo-icon">T</div>
                 <div class="logo-text">Turnero</div>
             </div>
             
             <div class="nav-actions">
-                <button class="theme-toggle" onclick="toggleTheme()" id="themeToggle">
-                    🌙
+                <button class="theme-toggle" onclick="toggleTheme()" id="themeToggle" title="Cambiar tema">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="5"/>
+                        <line x1="12" y1="1" x2="12" y2="3"/>
+                        <line x1="12" y1="21" x2="12" y2="23"/>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
+                        <line x1="1" y1="12" x2="3" y2="12"/>
+                        <line x1="21" y1="12" x2="23" y2="12"/>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+                    </svg>
                 </button>
                 <button class="home-btn" onclick="window.location.href='index.html'" title="Inicio">
-                    🏠
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+                        <polyline points="9,22 9,12 15,12 15,22"/>
+                    </svg>
                 </button>
             </div>
         </div>
@@ -41,6 +54,10 @@
                     <input type="date" class="form-input" id="fechaInput" min="">
                 </div>
                 <div class="form-group">
+                    <label class="form-label" for="horaInput">Hora</label>
+                    <input type="time" class="form-input" id="horaInput" value="18:00">
+                </div>
+                <div class="form-group">
                     <label class="form-label" for="deporteSelect">Tipo de cancha</label>
                     <select class="form-select" id="deporteSelect" onchange="actualizarFiltros()">
                         <option value="">Todas</option>
@@ -53,7 +70,7 @@
                         <option value="voley">Vóley</option>
                     </select>
                 </div>
-                <button type="submit" class="search-btn">🔍 Buscar</button>
+                <button type="submit" class="search-btn">Buscar</button>
             </form>
 
             <div class="filters" id="filtrosContainer">
@@ -62,8 +79,9 @@
         </section>
 
         <div class="results-header">
+            <h2 class="results-title">Resultados</h2>
             <select class="sort-dropdown" onchange="ordenarResultados(this.value)">
-                <option value="relevancia">Ordenar por: Relevancia</option>
+                <option value="relevancia">Relevancia</option>
                 <option value="precio-menor">Precio: Menor a Mayor</option>
                 <option value="precio-mayor">Precio: Mayor a Menor</option>
                 <option value="distancia">Distancia</option>
@@ -73,15 +91,17 @@
 
         <section class="results-section" id="resultsContainer">
             <div class="cancha-card" data-deporte="futbol5" data-ubicacion="Villa Crespo" data-precio="8000" data-rating="4.2" onclick="verDetalles('cancha1')">
-                <div class="cancha-image">⚽</div>
+                <div class="cancha-image">
+                    <div style="font-size: 2rem; font-weight: bold;">FC</div>
+                </div>
                 <div class="cancha-content">
                     <h3 class="cancha-title">Complejo Deportivo Central</h3>
-                    <div class="cancha-location">📍 Villa Crespo, CABA</div>
+                    <div class="cancha-location">Villa Crespo, CABA</div>
                     <div class="cancha-features">
-                        <span class="feature-tag">Fútbol 5</span>
-                        <span class="feature-tag">Vestuarios</span>
+                        <span class="feature-tag">Césped</span>
                         <span class="feature-tag">Parrilla</span>
-                        <span class="feature-tag">Césped sintético</span>
+                        <span class="feature-tag">Vestuarios</span>
+                        <span class="feature-tag">Luz</span>
                     </div>
                     <div class="cancha-price">
                         <span class="price">$8.000/hora</span>
@@ -90,15 +110,16 @@
             </div>
 
             <div class="cancha-card" data-deporte="futbol7" data-ubicacion="Palermo" data-precio="12000" data-rating="4.5" onclick="verDetalles('cancha2')">
-                <div class="cancha-image">🏟️</div>
+                <div class="cancha-image">
+                    <div style="font-size: 2rem; font-weight: bold;">CA</div>
+                </div>
                 <div class="cancha-content">
                     <h3 class="cancha-title">Cancha Los Amigos</h3>
-                    <div class="cancha-location">📍 Palermo, CABA</div>
+                    <div class="cancha-location">Palermo, CABA</div>
                     <div class="cancha-features">
-                        <span class="feature-tag">Fútbol 7</span>
                         <span class="feature-tag">Techada</span>
                         <span class="feature-tag">Parking</span>
-                        <span class="feature-tag">Césped natural</span>
+                        <span class="feature-tag">Césped Natural</span>
                     </div>
                     <div class="cancha-price">
                         <span class="price">$12.000/hora</span>
@@ -107,15 +128,16 @@
             </div>
 
             <div class="cancha-card" data-deporte="padel" data-ubicacion="Belgrano" data-precio="6000" data-rating="4.8" onclick="verDetalles('cancha3')">
-                <div class="cancha-image">🏸</div>
+                <div class="cancha-image">
+                    <div style="font-size: 2rem; font-weight: bold;">CP</div>
+                </div>
                 <div class="cancha-content">
                     <h3 class="cancha-title">Club de Pádel Norte</h3>
-                    <div class="cancha-location">📍 Belgrano, CABA</div>
+                    <div class="cancha-location">Belgrano, CABA</div>
                     <div class="cancha-features">
-                        <span class="feature-tag">Pádel</span>
+                        <span class="feature-tag">Cristal</span>
                         <span class="feature-tag">Profesores</span>
                         <span class="feature-tag">Climatizada</span>
-                        <span class="feature-tag">Cristal templado</span>
                     </div>
                     <div class="cancha-price">
                         <span class="price">$6.000/hora</span>
@@ -124,15 +146,16 @@
             </div>
 
             <div class="cancha-card" data-deporte="tenis" data-ubicacion="Recoleta" data-precio="15000" data-rating="4.7" onclick="verDetalles('cancha4')">
-                <div class="cancha-image">🎾</div>
+                <div class="cancha-image">
+                    <div style="font-size: 2rem; font-weight: bold;">TC</div>
+                </div>
                 <div class="cancha-content">
                     <h3 class="cancha-title">Tennis Club Recoleta</h3>
-                    <div class="cancha-location">📍 Recoleta, CABA</div>
+                    <div class="cancha-location">Recoleta, CABA</div>
                     <div class="cancha-features">
-                        <span class="feature-tag">Tenis</span>
-                        <span class="feature-tag">Polvo de ladrillo</span>
                         <span class="feature-tag">Profesores</span>
-                        <span class="feature-tag">Torneos</span>
+                        <span class="feature-tag">Parking</span>
+                        <span class="feature-tag">Climatizada</span>
                     </div>
                     <div class="cancha-price">
                         <span class="price">$15.000/hora</span>
@@ -141,15 +164,16 @@
             </div>
 
             <div class="cancha-card" data-deporte="futbol5" data-ubicacion="San Telmo" data-precio="7500" data-rating="3.9" onclick="verDetalles('cancha5')">
-                <div class="cancha-image">⚽</div>
+                <div class="cancha-image">
+                    <div style="font-size: 2rem; font-weight: bold;">PD</div>
+                </div>
                 <div class="cancha-content">
                     <h3 class="cancha-title">Predio Deportivo Sur</h3>
-                    <div class="cancha-location">📍 San Telmo, CABA</div>
+                    <div class="cancha-location">San Telmo, CABA</div>
                     <div class="cancha-features">
-                        <span class="feature-tag">Fútbol 5</span>
-                        <span class="feature-tag">Bar</span>
-                        <span class="feature-tag">WiFi</span>
-                        <span class="feature-tag">Césped sintético</span>
+                        <span class="feature-tag">Césped</span>
+                        <span class="feature-tag">Vestuarios</span>
+                        <span class="feature-tag">Parking</span>
                     </div>
                     <div class="cancha-price">
                         <span class="price">$7.500/hora</span>
@@ -158,14 +182,16 @@
             </div>
 
             <div class="cancha-card" data-deporte="basquet" data-ubicacion="Barracas" data-precio="9000" data-rating="4.1" onclick="verDetalles('cancha6')">
-                <div class="cancha-image">🏀</div>
+                <div class="cancha-image">
+                    <div style="font-size: 2rem; font-weight: bold;">BA</div>
+                </div>
                 <div class="cancha-content">
                     <h3 class="cancha-title">Básquet Arena</h3>
-                    <div class="cancha-location">📍 Barracas, CABA</div>
+                    <div class="cancha-location">Barracas, CABA</div>
                     <div class="cancha-features">
-                        <span class="feature-tag">Básquet</span>
-                        <span class="feature-tag">Tableros NBA</span>
-                        <span class="feature-tag">Aire acondicionado</span>
+                        <span class="feature-tag">Techada</span>
+                        <span class="feature-tag">Parking</span>
+                        <span class="feature-tag">Climatizada</span>
                         <span class="feature-tag">Vestuarios</span>
                     </div>
                     <div class="cancha-price">
@@ -173,10 +199,71 @@
                     </div>
                 </div>
             </div>
+
+            <div class="cancha-card" data-deporte="futbol5" data-ubicacion="Caballito" data-precio="8500" data-rating="4.3" onclick="verDetalles('cancha7')">
+                <div class="cancha-image">
+                    <div style="font-size: 2rem; font-weight: bold;">EC</div>
+                </div>
+                <div class="cancha-content">
+                    <h3 class="cancha-title">Estadio Central</h3>
+                    <div class="cancha-location">Caballito, CABA</div>
+                    <div class="cancha-features">
+                        <span class="feature-tag">Césped</span>
+                        <span class="feature-tag">Luz</span>
+                        <span class="feature-tag">Parrilla</span>
+                        <span class="feature-tag">Vestuarios</span>
+                    </div>
+                    <div class="cancha-price">
+                        <span class="price">$8.500/hora</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="cancha-card" data-deporte="padel" data-ubicacion="Puerto Madero" data-precio="18000" data-rating="4.9" onclick="verDetalles('cancha8')">
+                <div class="cancha-image">
+                    <div style="font-size: 2rem; font-weight: bold;">PM</div>
+                </div>
+                <div class="cancha-content">
+                    <h3 class="cancha-title">Pádel Premium</h3>
+                    <div class="cancha-location">Puerto Madero, CABA</div>
+                    <div class="cancha-features">
+                        <span class="feature-tag">Cristal</span>
+                        <span class="feature-tag">Profesores</span>
+                        <span class="feature-tag">Climatizada</span>
+                        <span class="feature-tag">Parking</span>
+                    </div>
+                    <div class="cancha-price">
+                        <span class="price">$18.000/hora</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="cancha-card" data-deporte="voley" data-ubicacion="Flores" data-precio="5000" data-rating="4.0" onclick="verDetalles('cancha9')">
+                <div class="cancha-image">
+                    <div style="font-size: 2rem; font-weight: bold;">VF</div>
+                </div>
+                <div class="cancha-content">
+                    <h3 class="cancha-title">Vóley Flores</h3>
+                    <div class="cancha-location">Flores, CABA</div>
+                    <div class="cancha-features">
+                        <span class="feature-tag">Techada</span>
+                        <span class="feature-tag">Climatizada</span>
+                        <span class="feature-tag">Vestuarios</span>
+                    </div>
+                    <div class="cancha-price">
+                        <span class="price">$5.000/hora</span>
+                    </div>
+                </div>
+            </div>
         </section>
 
         <div id="noResults" class="no-results" style="display: none;">
-            <div class="no-results-icon">🔍</div>
+            <div class="no-results-icon">
+                <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1">
+                    <circle cx="11" cy="11" r="8"/>
+                    <path d="m21 21-4.35-4.35"/>
+                </svg>
+            </div>
             <h3>No encontramos canchas que coincidan</h3>
             <p>Intenta cambiar los filtros de búsqueda, seleccionar otro deporte o ampliar tu zona de búsqueda.</p>
         </div>

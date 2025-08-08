@@ -3,37 +3,71 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Turnero - Alquila canchas</title>
+    <title>Turnero - Plataforma de Reservas Deportivas</title>
+    <meta name="description" content="Reserva canchas de fútbol, pádel y otros deportes de forma rápida y sencilla. La plataforma líder en gestión de espacios deportivos.">
     <link rel="stylesheet" href="css/main.css">
 </head>
 <body>
     <nav class="navbar">
         <div class="logo" onclick="window.location.href='index.html'">
-            <div class="logo-icon">⚽</div>
+            <div class="logo-icon">T</div>
+            <div class="logo-text">Turnero</div>
         </div>
         
         <div class="nav-links">
-            <a href="buscar.html" class="nav-link" onclick="mostrarBuscar()">Buscar canchas</a>
-            <a href="#propietario" class="btn-owner" onclick="mostrarPropietario()">Soy propietario</a>
-            <a href="#nosotros" class="nav-link" onclick="mostrarNosotros()">Quiénes somos</a>
-            <a href="dashboard.html">Panel de Control</a>
+            <a href="buscar.html" class="nav-link">Buscar Canchas</a>
+            <a href="#propietario" class="btn-owner">Soy Propietario</a>
+            <a href="#nosotros" class="nav-link">Empresa</a>
+            <a href="#contacto" class="nav-link">Soporte</a>
         </div>
     </nav>
 
     <main class="main-content">
-        <h1 class="hero-title">
-            Alquilá una cancha en <span class="highlight">3 clics</span>
-        </h1>
-        
-        <p class="hero-subtitle">
-            Fútbol 5 y pádel, sin llamadas ni mensajes de WhatsApp.
-        </p>
+        <section class="hero-section">
+            <h1 class="hero-title">
+                Reserva canchas deportivas en <span class="highlight">segundos</span>
+            </h1>
+            
+            <p class="hero-subtitle">
+                La plataforma más completa para encontrar y reservar espacios deportivos. 
+                Sin llamadas, sin complicaciones, solo deportes.
+            </p>
 
-        <div class="cta-buttons">
-            <a href="buscar.html" class="btn btn-primary" onclick="mostrarBuscar()">Buscar canchas</a>
-            <a href="#publicar" class="btn btn-secondary" onclick="mostrarPublicar()">Publicar mi cancha</a>
-        </div>
+            <div class="cta-buttons">
+                <a href="buscar.html" class="btn btn-primary">Explorar Canchas</a>
+                <a href="#publicar" class="btn btn-secondary">Publicar Espacio</a>
+            </div>
+        </section>
+
+        <section class="stats-section">
+            <div class="stat-item">
+                <span class="stat-number" data-target="1200">0</span>
+                <span class="stat-label">Canchas Activas</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-number" data-target="25000">0</span>
+                <span class="stat-label">Reservas Mensuales</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-number" data-target="98">0</span>
+                <span class="stat-label">% Satisfacción</span>
+            </div>
+        </section>
     </main>
+
+    <button class="theme-toggle" onclick="toggleTheme()" id="themeToggle" title="Cambiar tema">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="5"/>
+            <line x1="12" y1="1" x2="12" y2="3"/>
+            <line x1="12" y1="21" x2="12" y2="23"/>
+            <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/>
+            <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
+            <line x1="1" y1="12" x2="3" y2="12"/>
+            <line x1="21" y1="12" x2="23" y2="12"/>
+            <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/>
+            <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+        </svg>
+    </button>
 
     <script src="js/main.js"></script>
 </body>
